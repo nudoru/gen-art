@@ -1,10 +1,10 @@
 import canvasSketch from 'canvas-sketch';
-import {lerp} from 'canvas-sketch-util/math';
 import * as  random from 'canvas-sketch-util/random';
 import {grid2d2} from "./lib/grid";
-import {TWO_PI} from "./lib/number";
 import {injectGlobal} from 'emotion';
-import {filledCircle} from "./lib/shapes";
+import {filledCircle, filledRect} from "./lib/shapes";
+import {marginify, toSinValue} from "./lib/helpers";
+import {lerp} from "canvas-sketch-util/math";
 
 injectGlobal`
   body {
@@ -39,15 +39,15 @@ const sketch = () => {
 
   return {
     render({context, width, height, time, playhead}) {
-      context.fillStyle = 'white';
-      context.fillRect(0, 0, width, height);
+      filledRect({context, width, height, color: 'white'});
+
       grid.forEach(({position, color}) => {
         const [u, v] = position;
-        const x      = lerp(margin, width - margin, u);
-        const y      = lerp(margin, height - margin, v);
-        const t = Math.abs(Math.sin(playhead * (Math.PI * 2))) * .1;
 
-        const radius = Math.abs(random.noise3D(u, v, time)*3) * t;
+        const {x, y} = marginify({margin, u, v, width, height});
+        const t      = toSinValue(playhead) * .1;
+
+        const radius = Math.abs(random.noise3D(u, v, time) * 3) * t;
 
         filledCircle({context, x, y, radius: radius * width, color});
       })
